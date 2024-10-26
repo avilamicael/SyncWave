@@ -1,0 +1,131 @@
+{% extends 'frontend/base.html' %}
+{% load custom_tags %} <!-- Carrega as custom tags -->
+
+<title>{% block title %}Clientes{% endblock %}</title>
+
+{% block content %}
+<div class="card shadow mb-4">
+    <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+        <h5 class="m-0 font-weight-bold text-primary">Lista de clientes</h5>
+        <a class="nav-link" href="#" data-toggle="modal" data-target="#addClienteModal">
+            <i class="fas fa-user-plus"></i>
+        </a>
+    </div>
+    <!-- Card Body -->
+    <div class="card-body">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Nome</th>
+                    <th>CPF/CNPJ</th>
+                    <th>Contato</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for cliente in clientes %}
+                <tr>
+                    <td>{{ cliente.nome }}</td>
+                    <td>{{ cliente.cpf_cnpj|formatar_cpf_cnpj }}</td>
+                    <td>
+                        <!-- Link do WhatsApp -->
+                        <a href="https://wa.me/{{ cliente.contato|slugify }}" target="_blank"
+                            title="Enviar mensagem no WhatsApp">
+                            <i class="fab fa-whatsapp fa-lg" style="color: #25D366;"></i>
+                            <!-- Ícone do WhatsApp com cor verde padrão -->
+                        </a>
+                        {{ cliente.contato|formatar_telefone }}
+                    </td>
+                    <td>
+                        <a href="#" class="btn btn-sm btn-primary" data-toggle="modal" data-target="#viewClienteModal"
+                            data-id="{{ cliente.id }}" data-tipo="{{ cliente.cliente_tipo }}"
+                            onclick="buscarDadosCliente({{ cliente.id }}, '{{ cliente.cliente_tipo }}')">
+                            <i class='bx bxs-edit'></i>
+                        </a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+{% include 'frontend/clientes/modals/add_cliente.html' %}
+{% include 'frontend/clientes/modals/edit_cliente.html' %}
+
+<script>
+    function buscarDadosCliente(clienteId, tipoCliente) {
+        // Faz a requisição para buscar os dados do cliente
+        fetch(`/clientes/detalhes/${clienteId}/${tipoCliente}/`)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Erro ao buscar os dados do cliente');
+                }
+                return response.json();
+            })
+            .then(cliente => {
+                // Preencher os campos do modal com os dados do cliente
+                preencherModalComDados(cliente);
+            })
+            .catch(error => {
+                console.error('Erro ao buscar os dados do cliente:', error);
+            });
+    }
+
+    function preencherModalComDados(cliente) {
+        // Campos comuns
+        document.getElementById('edit_nome').value = cliente.nome || '';
+        document.getElementById('edit_cpf_cnpj').value = cliente.cpf_cnpj || '';
+        document.getElementById('edit_contato').value = cliente.contato || '';
+        document.getElementById('edit_email').value = cliente.email || '';
+        document.getElementById('edit_logradouro').value = cliente.logradouro || '';
+        document.getElementById('edit_bairro').value = cliente.bairro || '';
+        document.getElementById('edit_cidade').value = cliente.cidade || '';
+        document.getElementById('edit_uf').value = cliente.uf || '';
+        document.getElementById('edit_numero').value = cliente.numero || '';
+        document.getElementById('edit_complemento').value = cliente.complemento || '';
+        document.getElementById('edit_cep').value = cliente.cep || '';
+        document.getElementById('edit_observacoes').value = cliente.observacoes || '';
+
+        // Verificar tipo de cliente
+        if (cliente.tipo === 'fisica') {
+            document.getElementById('edit_rg').value = cliente.rg || '';
+            document.getElementById('edit_data_nascimento').value = cliente.data_nascimento || '';
+
+            document.getElementById('edit_pessoa_fisica_fields').style.display = 'block';
+            document.getElementById('edit_pessoa_juridica_fields').style.display = 'none';
+        } else if (cliente.tipo === 'juridica') {
+            document.getElementById('edit_razao_social').value = cliente.razao_social || '';
+            document.getElementById('edit_inscricao_estadual').value = cliente.inscricao_estadual || '';
+
+            document.getElementById('edit_pessoa_fisica_fields').style.display = 'none';
+            document.getElementById('edit_pessoa_juridica_fields').style.display = 'block';
+        }
+
+        // // Exibir documentos anexados, se houver
+        // var documentosDiv = document.getElementById('documentos_anexados');
+        // documentosDiv.innerHTML = '';  // Limpar o conteúdo existente
+
+        // if (cliente.documentos) {
+        //     var extensao = cliente.documentos.split('.').pop().toLowerCase();
+        //     var mimeTypesVisualizacao = ['pdf', 'jpg', 'jpeg', 'png', 'gif'];
+
+        //     if (mimeTypesVisualizacao.includes(extensao)) {
+        //         // Se for um tipo de arquivo que o navegador pode visualizar (ex: PDF ou imagem)
+        //         documentosDiv.innerHTML = `<iframe src="${cliente.documentos}" style="width:100%; height:500px;" frameborder="0"></iframe>`;
+        //     } else {
+        //         // Se for outro tipo de arquivo, fornecer opção de download
+        //         documentosDiv.innerHTML = `<a href="${cliente.documentos}" download>Baixar documento</a>`;
+        //     }
+        // } else {
+        //     documentosDiv.innerHTML = 'Nenhum documento anexado.';
+        // }
+
+        // Exibir o modal de edição
+        $('#viewClienteModal').modal('show');
+    }
+</script>
+
+{% endblock %}

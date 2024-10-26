@@ -1,0 +1,267 @@
+{%load static%}
+<div class="modal fade" id="addClienteModal" tabindex="-1" role="dialog" aria-labelledby="addClienteModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog modal-xl" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addClienteModalLabel">Adicionar Cliente</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="addClienteForm" enctype="multipart/form-data">
+                    {% csrf_token %}
+
+                    <!-- Tipo de cliente -->
+                    <div class="form-row">
+                        <div class="form-group col-md-4">
+                            <label for="cliente_tipo">Tipo de Cliente</label>
+                            <select class="form-control" id="cliente_tipo" name="cliente_tipo">
+                                <option value="fisica">Pessoa Física</option>
+                                <option value="juridica">Pessoa Jurídica</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Campos Comuns a Ambos -->
+                    <div class="form-row">
+                        <div class="form-group col-md-3">
+                            <label for="cpf_cnpj">CPF/CNPJ</label>
+                            <input type="text" class="form-control" id="cpf_cnpj" name="cpf_cnpj" required>
+                        </div>
+                        <div class="form-group col-md-3">
+                            <label for="nome">Nome/Nome Fantasia</label>
+                            <input type="text" class="form-control" id="nome" name="nome" required>
+                        </div>
+
+                        <!-- Campos Específicos para Pessoa Física e Jurídica na Mesma Linha -->
+                        <div id="pessoa_fisica_fields" class="form-group col-md-6">
+                            <div class="form-row">
+                                <div class="form-group col-md-6">
+                                    <label for="rg">RG</label>
+                                    <input type="text" class="form-control" id="rg" name="rg">
+                                </div>
+                                <div class="form-group col-md-6">
+                                    <label for="data_nascimento">Data de Nascimento</label>
+                                    <input type="date" class="form-control" id="data_nascimento" name="data_nascimento">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div id="pessoa_juridica_fields" class="form-group col-md-6" style="display: none;">
+                            <div class="form-row">
+                                <div class="form-group col-md-6">
+                                    <label for="razao_social">Razão Social</label>
+                                    <input type="text" class="form-control" id="razao_social" name="razao_social">
+                                </div>
+                                <div class="form-group col-md-6">
+                                    <label for="inscricao_estadual">Inscrição Estadual</label>
+                                    <input type="text" class="form-control" id="inscricao_estadual"
+                                        name="inscricao_estadual">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group col-md-3">
+                            <label for="email">Email</label>
+                            <input type="email" class="form-control" id="email" name="email" required>
+                        </div>
+                        <div class="form-group col-md-3">
+                            <label for="contato">Contato</label>
+                            <input type="text" class="form-control" id="contato" name="contato" required>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group col-md-2">
+                            <label for="cep">CEP</label>
+                            <input type="text" class="form-control" id="cep" name="cep" required>
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label for="logradouro">Logradouro</label>
+                            <input type="text" class="form-control" id="logradouro" name="logradouro" required>
+                        </div>
+                        <div class="form-group col-md-2">
+                            <label for="numero">Número</label>
+                            <input type="text" class="form-control" id="numero" name="numero" required>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group col-md-3">
+                            <label for="complemento">Complemento</label>
+                            <input type="text" class="form-control" id="complemento" name="complemento">
+                        </div>
+                        <div class="form-group col-md-3">
+                            <label for="bairro">Bairro</label>
+                            <input type="text" class="form-control" id="bairro" name="bairro" required>
+                        </div>
+                        <div class="form-group col-md-3">
+                            <label for="uf">UF</label>
+                            <input type="text" class="form-control" id="uf" name="uf" maxlength="2" required>
+                        </div>
+                        <div class="form-group col-md-3">
+                            <label for="cidade">Cidade</label>
+                            <input type="text" class="form-control" id="cidade" name="cidade" required>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group col-md-12">
+                            <label for="observacoes">Observações</label>
+                            <textarea class="form-control" id="observacoes" name="observacoes" rows="3"></textarea>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="documentos">Documentos</label>
+                        <div class="custom-file">
+                            <input type="file" class="custom-file-input" id="documentos" name="documentos">
+                            <label class="custom-file-label" for="documentos" data-browse="Escolher arquivo">Selecione
+                                um arquivo...</label>
+                        </div>
+                    </div>
+
+
+
+                    <button type="submit" class="btn btn-primary">Salvar</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="{% static 'js/utils/buscar_cnpj.js' %}"></script>
+<script src="{% static 'js/utils/buscar_cep.js' %}"></script>
+
+<script>
+    $(document).ready(function () {
+        // Máscara CPF/CNPJ
+        $('#cpf_cnpj').inputmask({
+            mask: ['999.999.999-99', '99.999.999/9999-99'],
+            keepStatic: true
+        });
+
+        // Máscara Contato
+        $('#contato').inputmask({
+            mask: ['(99) 9999-9999', '(99) 9 9999-9999'],
+            keepStatic: true
+        });
+
+        // Máscara CEP
+        $('#cep').inputmask('99999-999');
+    });
+</script>
+
+<script>
+    $(document).ready(function () {
+        // Alternar campos ao selecionar o tipo de cliente
+        $('#cliente_tipo').change(function () {
+            var tipo = $(this).val();
+            if (tipo === 'fisica') {
+                $('#pessoa_fisica_fields').show();
+                $('#pessoa_juridica_fields').hide();
+            } else if (tipo === 'juridica') {
+                $('#pessoa_fisica_fields').hide();
+                $('#pessoa_juridica_fields').show();
+            }
+        });
+
+        // Submeter o formulário via Ajax
+        $('#addClienteForm').on('submit', function (event) {
+            event.preventDefault();
+
+            var formData = new FormData(this);
+
+            $.ajax({
+                url: "{% url 'add_cliente' %}",
+                method: "POST",
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function (data) {
+                    if (data.success) {
+                        mostrarNotificacao('Cliente adicionado com sucesso!', 'success');
+                        $('#addClienteModal').modal('hide');
+
+                        setTimeout(function () {
+                            location.reload();
+                        }, 2000);
+                    } else {
+                        console.error('Erros de validação:', data.errors);
+                        mostrarNotificacao(data.errors, 'error');
+                    }
+                },
+                error: function (xhr) {
+                    console.error('Erro na requisição:', xhr.responseText);
+                    let errorResponse;
+                    try {
+                        errorResponse = JSON.parse(xhr.responseText);
+                        mostrarNotificacao(errorResponse.errors || errorResponse.message || 'Erro desconhecido.', 'error');
+                    } catch (e) {
+                        mostrarNotificacao('Erro: ' + xhr.statusText, 'error');
+                    }
+                }
+            });
+        });
+
+
+        // Adiciona o evento blur no campo CPF/CNPJ para buscar os dados da API
+        configurarCampoCNPJ('cpf_cnpj', function (dadosCnpj) {
+            const estabelecimento = dadosCnpj.estabelecimento || {};
+            const estado = estabelecimento.estado || {};
+            const cidade = estabelecimento.cidade || {};
+            const inscricoesEstaduais = estabelecimento.inscricoes_estaduais || [];
+
+            // Preenche os campos com os dados retornados da API
+            $('#nome').val(estabelecimento.nome_fantasia || ''); // Nome Fantasia -> Nome
+            $('#razao_social').val(dadosCnpj.razao_social || ''); // Razão Social
+
+            // Inscrição Estadual
+            if (inscricoesEstaduais.length > 0) {
+                $('#inscricao_estadual').val(inscricoesEstaduais[0].inscricao_estadual || '');
+            } else {
+                $('#inscricao_estadual').val(''); // Se não houver inscrição estadual
+            }
+
+            // Verifica e preenche os campos restantes
+            $('#email').val(estabelecimento.email || ''); // Email
+            $('#bairro').val(estabelecimento.bairro || ''); // Bairro
+            $('#logradouro').val(estabelecimento.logradouro || ''); // Logradouro
+            $('#numero').val(estabelecimento.numero || ''); // Número
+            $('#cep').val(estabelecimento.cep || ''); // CEP
+            $('#complemento').val(estabelecimento.complemento || ''); // Complemento
+            $('#uf').val(estado.sigla || ''); // UF
+            $('#cidade').val(cidade.nome || ''); // Cidade
+        });
+
+        // Adiciona o evento blur no campo CEP para buscar o endereço automaticamente
+        $('#cep').on('blur', async function () {
+            const cep = $(this).val();
+
+            // Chama a função buscarCEP definida no arquivo buscar_cep.js
+            const dados = await buscarCEP(cep);
+
+            if (!dados.erro) {
+                // Preenche os campos de endereço com os dados retornados
+                $('#logradouro').val(dados.logradouro || '');
+                $('#bairro').val(dados.bairro || '');
+                $('#cidade').val(dados.localidade || '');
+                $('#uf').val(dados.uf || '');
+            } else {
+                mostrarNotificacao(dados.mensagem, 'error');
+            }
+        });
+
+    });
+</script>
+<script>
+    document.querySelector('.custom-file-input').addEventListener('change', function (e) {
+        var fileName = document.getElementById("documentos").files[0].name;
+        var nextSibling = e.target.nextElementSibling;
+        nextSibling.innerText = fileName;
+    });
+</script>
