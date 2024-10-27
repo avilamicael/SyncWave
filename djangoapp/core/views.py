@@ -36,9 +36,9 @@ def protected_media(request, path):
     file_path = os.path.join(settings.MEDIA_ROOT, path)
     if os.path.exists(file_path):
         response = HttpResponse()
-        response['Content-Type'] = ''
-        # Informa ao Nginx para servir o arquivo protegido
-        response['X-Accel-Redirect'] = '/protected_media/' + path
+        response['Content-Type'] = ''  # O Nginx determinará o tipo de conteúdo
+        # Define o cabeçalho X-Accel-Redirect com o caminho correto relativo ao Nginx
+        response['X-Accel-Redirect'] = f'/protected_media/{path}'
         return response
     else:
         raise Http404

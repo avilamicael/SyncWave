@@ -28,7 +28,7 @@ class ClienteBase(models.Model):
     def documentos_protegidos_url(self):
         if self.documentos:
             path = quote(self.documentos.name)
-            return reverse('protected_media', args=[path])
+            return reverse('protected_media', args=[path]).rstrip('/')
         return None
 
 
