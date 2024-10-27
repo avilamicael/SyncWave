@@ -101,15 +101,14 @@
                     <div class="form-group">
                         <label>Documentos Anexados</label>
                         <div id="documentos_anexados">
-                            {% if cliente.documentos_protegidos_url %}
-                            <iframe src="{{ cliente.documentos_protegidos_url }}" style="width:100%; height:500px;"
-                                frameborder="0"></iframe>
+                            {% if cliente.documentos %}
+                                <a href="{{ cliente.documentos_protegidos_url }}">Baixar Documento</a>
                             {% else %}
-                            <p>Nenhum documento anexado.</p>
+                                <p>Nenhum documento anexado.</p>
                             {% endif %}
                         </div>
                     </div>
-
+                    
 
 
 

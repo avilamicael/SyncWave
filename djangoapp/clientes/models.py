@@ -26,11 +26,8 @@ class ClienteBase(models.Model):
 
     @property
     def documentos_protegidos_url(self):
-        """Retorna a URL protegida para o documento."""
         if self.documentos:
-            # Garantir que o caminho esteja codificado corretamente usando urllib.parse.quote
             path = quote(self.documentos.name)
-            # Gera a URL protegida usando o caminho armazenado no campo 'documentos'
             return reverse('protected_media', args=[path])
         return None
 

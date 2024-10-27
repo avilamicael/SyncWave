@@ -2,8 +2,10 @@ from django.shortcuts import render
 from django.contrib import messages
 from django.http import JsonResponse
 import json, os
-from django.http import FileResponse, Http404
+from django.http import HttpResponse, Http404
 from django.conf import settings
+from django.contrib.auth.decorators import login_required
+from urllib.parse import unquote
 
 def home(request):
     return render(request, 'frontend/home.html')
@@ -26,17 +28,17 @@ def adicionar_mensagem(request):
         return JsonResponse({'status': 'Mensagem adicionada com sucesso'})
     return JsonResponse({'status': 'Método não permitido'}, status=405)
 
+@login_required
 def protected_media(request, path):
-    # Verifique se o usuário está autenticado
-    if not request.user.is_authenticated:
-        raise Http404("Você não tem permissão para acessar este arquivo.")
-
-    # Caminho absoluto do arquivo no sistema de arquivos
-    full_path = os.path.join(settings.MEDIA_ROOT, path)
-
-    # Verificar se o arquivo existe no sistema de arquivos
-    if not os.path.exists(full_path):
-        raise Http404("Arquivo não encontrado.")
-
-    # Servir o arquivo
-    return FileResponse(open(full_path, 'rb'))
+    # Decodifica o caminho para lidar com espaços e caracteres especiais
+    path = unquote(path)
+    # Constrói o caminho completo do arquivo
+    file_path = os.path.join(settings.MEDIA_ROOT, path)
+    if os.path.exists(file_path):
+        response = HttpResponse()
+        response['Content-Type'] = ''
+        # Informa ao Nginx para servir o arquivo protegido
+        response['X-Accel-Redirect'] = '/protected_media/' + path
+        return response
+    else:
+        raise Http404
